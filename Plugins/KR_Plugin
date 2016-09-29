@@ -1,8 +1,12 @@
 /*:
  *
- * @plugindesc Kleberson Romero Wather Mark
+ * @plugindesc KR_Plugin
  * @author Kleberson Romero (GS_TEAM)
  * @version 1.0.4
+ *
+ *
+ * @param ===================
+ * @default  KR_PLUGIN WATHERMARK CONFIG
  *
  * @param Image
  * @desc Imagem a ser utilizada como marca d'agua
@@ -17,8 +21,69 @@
  * 0 Sup.Esquerdo, 1 Inf.Esquerdo,2 Sup.Direito, 3 Inf.Direito
  * @default 0
  *
+ * @param =====================
+ * @default  KR_PLUGIN KR_HUD CONFIG
+ *
+ * @param Default Actor
+ * @desc Personagem  padrão de leitura de dados
+ * @default 1
+ *
+ * @param BackSprite_Hud
+ * @desc Imagem de Base para a Hud
+ * @default HUD_Background
+ *
+ * @param Back_X
+ * @desc Posição X da Imagem de Base para a Hud
+ * @default 40
+ *
+ * @param Back_Y
+ * @desc Posição Y da Imagem de Base para a Hud
+ * @default 20
+ *
+ * @param HP_Image
+ * @desc Imagem de HP para a Hud
+ * @default HP
+ *
+ * @param HP_Image_X
+ * @desc Posição X da Imagem de HP para a Hud
+ * @default 88
+ *
+ * @param HP_Image_Y
+ * @desc Posição Y da Imagem de HP para a Hud
+ * @default 26
+ *
+ * @param MP_Image
+ * @desc Imagem de MP para a Hud
+ * @default MP
+ *
+ * @param MP_Image_X
+ * @desc Posição X da Imagem de MP para a Hud
+ * @default 88
+ *
+ * @param MP_Image_Y
+ * @desc Posição Y da Imagem de MP para a Hud
+ * @default 50
+ *
+ * @param XP_Image
+ * @desc Imagem de XP para a Hud
+ * @default XP
+ *
+ * @param XP_Image_X
+ * @desc Posição X da Imagem de XP para a Hud
+ * @default 88
+ *
+ * @param XP_Image_Y
+ * @desc Posição Y da Imagem de XP para a Hud
+ * @default 74
+
+ * @param ======================
+ * @default  ===================
+ *
  * @help
+ * Esse plugin é excencial para funcionamento de todos os
+ * plugins de minha autoria.
  * Esse plugin adiciona uma marca d'agua no seu projeto
+ *
  * seu uso é mais constante em vídeo aulas ou tutoriais.
  *
  * Comandos de plugin:
@@ -34,7 +99,8 @@
  * Wathermark animate true  
  * Wathermark show
  * Wathermark hide
- * 
+ *
+ * Esse plugin possui configuração de outros scripts 
 */
 
 var parameters = PluginManager.parameters('KR_Plugin'); // Nome do Arquivo de Plugins sem o .JS
@@ -43,6 +109,36 @@ var KR_Opacity = Number(parameters['Opacity Wathermark'] || 150);
 var KR_Position = Number(parameters['Position Wathermark'] || 1);
 
 var KR = KR || {};
+KR.KR_Plugin = {};
+KR.Hud = {};
+KR.version = {};
+KR.version = 1.0
+//-------------------------------------------------------------------------------------------------
+// 
+//-------------------------------------------------------------------------------------------------
+KR.Hud.DefaultActor = Number(PluginManager.parameters('KR_Hud')['Default Actor'] || 1);
+// Parametros customizaveis do PluginManager para Imagem de Fundo ou Base da Hud
+KR.Hud.Back_Sprite  = PluginManager.parameters('KR_Hud')['BackSprite_Hud'] || "HUD_Background";
+KR.Hud.Back_X       = Number(PluginManager.parameters('KR_Hud')['HUD Back_X'] || 40);
+KR.Hud.Back_Y       = Number(PluginManager.parameters('KR_Hud')['HUD Back_Y'] || 20);
+// Parametros customizaveis do PluginManager para Imagem de HP
+KR.Hud.HP_Sprite    = PluginManager.parameters('KR_Hud')['HP_Image'] || "HP";
+KR.Hud.HP_Image_X   = Number(PluginManager.parameters('KR_Hud')['HP_Image_X'] || 88);
+KR.Hud.HP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['HP_Image_Y'] || 26);
+// Parametros customizaveis do PluginManager para Imagem de MP
+KR.Hud.MP_Sprite    = PluginManager.parameters('KR_Hud')['MP_Image'] || "MP";
+KR.Hud.MP_Image_X   = Number(PluginManager.parameters('KR_Hud')['MP_Image_X'] || 88);
+KR.Hud.MP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['MP_Image_Y'] || 50);
+// Parametros customizaveis do PluginManager para Imagem de XP
+KR.Hud.XP_Sprite    = PluginManager.parameters('KR_Hud')['XP_Image'] || "XP";
+KR.Hud.XP_Image_X   = Number(PluginManager.parameters('KR_Hud')['XP_Image_X'] || 88);
+KR.Hud.XP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['XP_Image_Y'] || 74);
+//-------------------------------------------------------------------------------------------------
+//
+//-------------------------------------------------------------------------------------------------
+
+
+
 
 var _Scene_Base_createWindowLayer = Scene_Base.prototype.createWindowLayer;
 Scene_Base.prototype.createWindowLayer = function(){
@@ -75,7 +171,7 @@ Scene_Base.prototype.update = function() {
     _Scene_Base_update.call(this);
     if(typeof this._krSprite1 === 'object')
     {
-        if(KR.animate){
+        if(KR.KR_Plugin.animate){
         this._count += 0.06;
         this._krSprite1.scale.x = 1 + Math.sin(this._count) * 0.02;
         this._krSprite1.scale.y = 1 + Math.sin(this._count) * 0.02;
@@ -83,10 +179,10 @@ Scene_Base.prototype.update = function() {
         this._krSprite1.scale.x = 1.0
         this._krSprite1.scale.y = 1.0;            
         }
-        if(KR.hide){this._krSprite1.opacity -= 4}else if(!KR.hide){
-        if(this._krSprite1.opacity <= KR_Opacity){this._krSprite1.opacity += 4}else{KR.hide = null}};
-        if(KR.move)this._krSprite1.move(KR.moveX, KR.moveY);
-        if(KR.changeOpacity){if(this._krSprite1.opacity <= KR_Opacity){this._krSprite1.opacity += 4}else if(this._krSprite1.opacity >= KR_Opacity){this._krSprite1.opacity -= 4}else{KR.changeOpacity = false}};
+        if(KR.KR_Plugin.hide){this._krSprite1.opacity -= 4}else if(!KR.KR_Plugin.hide){
+        if(this._krSprite1.opacity <= KR_Opacity){this._krSprite1.opacity += 4}else{KR.KR_Plugin.hide = null}};
+        if(KR.KR_Plugin.move)this._krSprite1.move(KR.KR_Plugin.moveX, KR.KR_Plugin.moveY);
+        if(KR.KR_Plugin.changeOpacity){if(this._krSprite1.opacity <= KR_Opacity){this._krSprite1.opacity += 4}else if(this._krSprite1.opacity >= KR_Opacity){this._krSprite1.opacity -= 4}else{KR.changeOpacity = false}};
     }
 };
 
@@ -99,10 +195,10 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
       var numero1 = Number(args[1]);
       var numero2 = Number(args[2]);
       var boolean = eval(String(args[1]).toLowerCase());
-      if(texto === 'hide')return KR.hide = true;
-      if(texto === 'show')return KR.hide = false;
-      if(texto === 'move')return KR.move = true, KR.moveX = numero1, KR.moveY = numero2;
-      if(texto === 'opacity')return KR.changeOpacity = true, KR_Opacity = numero1;
-      if(texto === 'animate')return KR.animate = boolean;
+      if(texto === 'hide')return KR.KR_Plugin.hide = true;
+      if(texto === 'show')return KR.KR_Plugin.hide = false;
+      if(texto === 'move')return KR.KR_Plugin.move = true, KR.KR_Plugin.moveX = numero1, KR.KR_Plugin.moveY = numero2;
+      if(texto === 'opacity')return KR.KR_Plugin.changeOpacity = true, KR_Opacity = numero1;
+      if(texto === 'animate')return KR.KR_Plugin.animate = boolean;
    }
 };
