@@ -1,80 +1,35 @@
 /*:
  *
- *@plugindesc Kleberson Romero HUD
+ *@plugindesc KR_HUD
  *@author Kleberson Romero (GS_TEAM)
  *
- * @param Default Actor
- * @desc Personagem  padrão de leitura de dados
- * @default 1
- *
- *@param ====================
- *@default  ====================
- *@param BackSprite_Hud
- *@desc Imagem de Base para a Hud
- *@default HUD_Background
- *
- *@param Back_X
- *@desc Posição X da Imagem de Base para a Hud
- *@default 40
- *
- *@param Back_Y
- *@desc Posição Y da Imagem de Base para a Hud
- *@default 20
- *@param ====================
- *@default  ====================
- *
- *@param HP_Image
- *@desc Imagem de HP para a Hud
- *@default HP
- *
- *@param HP_Image_X
- *@desc Posição X da Imagem de HP para a Hud
- *@default 88
- *
- *@param HP_Image_Y
- *@desc Posição Y da Imagem de HP para a Hud
- *@default 26
- *@param ====================
- *@default  ====================
- *
- *@param MP_Image
- *@desc Imagem de MP para a Hud
- *@default MP
- *
- *@param MP_Image_X
- *@desc Posição X da Imagem de MP para a Hud
- *@default 88
- *
- *@param MP_Image_Y
- *@desc Posição Y da Imagem de MP para a Hud
- *@default 50
- *
- *@param ====================
- *@default  ====================
- *
- *@param XP_Image
- *@desc Imagem de XP para a Hud
- *@default XP
- *
- *@param XP_Image_X
- *@desc Posição X da Imagem de XP para a Hud
- *@default 88
- *
- *@param XP_Image_Y
- *@desc Posição Y da Imagem de XP para a Hud
- *@default 74
  *
  *@help
- Sistema Baseado nos cod Soulpour777
- Otimizado para funções unicas sem atualização desnecessárias.
- Totalmente customizado, Plugin sob licença MIT, caso use 
- em seu projeto deverá dar os devidos créditos.
+ * Sistema Baseado nos cod Soulpour777
+ * Otimizado para funções unicas sem atualização desnecessárias.
+ * Totalmente customizado, Plugin sob licença MIT, caso use 
+ * em seu projeto deverá dar os devidos créditos.
+ *
+ * Todos os meus Plugins dependem do KR_Plugin por favor
+ * Baixe a sua versão em:
+ * https://github.com/klebersonromero/KR_MV/tree/master/Plugins
  *
 */
 
-// Criando um objeto e colocando ele como Hud para chamar funções
+// Cria uma Variavel KR
 var KR = KR || {};
-KR.Hud = {};
+// Verifica se possui o KR_Plugin
+if (KR["KR_Plugin"] === undefined) {
+  alert("Please add KR_Plugin before KR_Hud!");
+  alert("https://github.com/klebersonromero/KR_MV/tree/master/Plugins");
+  throw new Error("Please add KR_Plugin before KR_Hud!");
+};
+// Verifica a versão do KR_Plugin
+if (KR["version"] < 0.9) {
+  alert("Please update KR_Plugin!");
+  alert("https://github.com/klebersonromero/KR_MV/tree/master/Plugins");
+  throw new Error("Please update KR_Plugin!");
+}
 //-------------------------------------------------------------
 // Alias do Objeto Game_System.initialize
 //-------------------------------------------------------------
@@ -83,24 +38,6 @@ Game_System.prototype.initialize = function() {
     KR.Hud.xinitialize.call(this);
     this._defaultActor = KR.Hud.DefaultActor;
 };
-//-------------------------------------------------------------
-KR.Hud.DefaultActor = Number(PluginManager.parameters('KR_Hud')['Default Actor'] || 1);
-// Parametros customizaveis do PluginManager para Imagem de Fundo ou Base da Hud
-KR.Hud.Back_Sprite  = PluginManager.parameters('KR_Hud')['BackSprite_Hud'] || "HUD_Background";
-KR.Hud.Back_X       = Number(PluginManager.parameters('KR_Hud')['HUD Back_X'] || 40);
-KR.Hud.Back_Y 	    = Number(PluginManager.parameters('KR_Hud')['HUD Back_Y'] || 20);
-// Parametros customizaveis do PluginManager para Imagem de HP
-KR.Hud.HP_Sprite    = PluginManager.parameters('KR_Hud')['HP_Image'] || "HP";
-KR.Hud.HP_Image_X   = Number(PluginManager.parameters('KR_Hud')['HP_Image_X'] || 88);
-KR.Hud.HP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['HP_Image_Y'] || 26);
-// Parametros customizaveis do PluginManager para Imagem de MP
-KR.Hud.MP_Sprite    = PluginManager.parameters('KR_Hud')['MP_Image'] || "MP";
-KR.Hud.MP_Image_X   = Number(PluginManager.parameters('KR_Hud')['MP_Image_X'] || 88);
-KR.Hud.MP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['MP_Image_Y'] || 50);
-// Parametros customizaveis do PluginManager para Imagem de XP
-KR.Hud.XP_Sprite    = PluginManager.parameters('KR_Hud')['XP_Image'] || "XP";
-KR.Hud.XP_Image_X   = Number(PluginManager.parameters('KR_Hud')['XP_Image_X'] || 88);
-KR.Hud.XP_Image_Y   = Number(PluginManager.parameters('KR_Hud')['XP_Image_Y'] || 74);
 //---------------------------------------------------------------------------------------
 // Criação da Função Sprite_HudBase
 //---------------------------------------------------------------------------------------
@@ -158,25 +95,25 @@ Sprite_HudBase.prototype.updateBar = function () {
   this._xp_sprite.y = this.y + KR.Hud.XP_Image_Y;
   this._xp_sprite.opacity = this.opacity;
   this.addChild(this._xp_sprite);
-}
+};
 //---------------------------------------------------------------------------------------
 //  Atualização da taxa de Sprite de HP na HUD
 //---------------------------------------------------------------------------------------
 Sprite_HudBase.prototype.setHpRate = function (rate) {
     this._hp_sprite.setFrame(0, 0, this._hp_sprite.bitmap.width * rate, this._hp_sprite.bitmap.height);
-}
+};
 //---------------------------------------------------------------------------------------
 //  Atualização da taxa de Sprite de MP na HUD
 //---------------------------------------------------------------------------------------
 Sprite_HudBase.prototype.setMpRate = function (rate) {
     this._mp_sprite.setFrame(0, 0, this._mp_sprite.bitmap.width * rate, this._mp_sprite.bitmap.height);
-}
+};
 //---------------------------------------------------------------------------------------
 //  Atualização da taxa de Sprite de MP na HUD
 //---------------------------------------------------------------------------------------
 Sprite_HudBase.prototype.setXpRate = function (rate) {
     this._xp_sprite.setFrame(0, 0, this._xp_sprite.bitmap.width * rate, this._xp_sprite.bitmap.height);
-}
+};
 //---------------------------------------------------------------------------------------
 //  Criar a função da Sprite de HP
 //---------------------------------------------------------------------------------------
@@ -209,7 +146,7 @@ Sprite_StatusBar.prototype.update = function () {
      this.setHpRate(this._actor.hpRate());
      this.setMpRate(this._actor.mpRate());
      this.setXpRate(this._actor.currentExp() / this._actor.nextLevelExp());
-  }
+  };
 };
 //---------------------------------------------------------------------------------------
 //  Criar a Hud da Spriteset_Map
