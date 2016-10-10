@@ -2,7 +2,7 @@
  *
  * @plugindesc KR_Plugin
  * @author Kleberson Romero (GS_TEAM)
- * @version 1.2
+ * @version 1.4
  *
  * @param ===================
  * @default  KR_PLUGIN WATHERMARK CONFIG
@@ -28,6 +28,12 @@
  *
  * Esse plugin possui configuração de outros plugins 
  * Atualizações:
+
+ * Versão 1.4
+ * Devolução da automomia de configuração da HUD para o KR_HUD Plugin;
+ *
+ * Versão 1.3 
+ * Resolvidos conflitos no PluginManager;
  *
  * Versão 1.2 
  * Comandos de Plugin para Hud add;
