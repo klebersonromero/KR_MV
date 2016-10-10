@@ -3,7 +3,6 @@
  *@plugindesc KR_HUD
  *@author Kleberson Romero (GS_TEAM)
  *
- *
  *@help
  * Sistema Baseado nos cod Soulpour777
  * Otimizado para funções unicas sem atualização desnecessárias.
@@ -14,10 +13,67 @@
  * Baixe a sua versão em:
  * https://github.com/klebersonromero/KR_MV/tree/master/Plugins
  *
+ * @param ====================
+ * @default  ===================
+ *
+ * @param Default Actor
+ * @desc Personagem  padrão de leitura de dados
+ * @default 1
+ *
+ * @param BackSprite_Hud
+ * @desc Imagem de Base para a Hud
+ * @default HUD_Background
+ *
+ * @param HUD_Back_X
+ * @desc Posição X da Imagem de Base para a Hud
+ * @default 40
+ *
+ * @param HUD_Back_Y
+ * @desc Posição Y da Imagem de Base para a Hud
+ * @default 20
+ *
+ * @param HP_Image
+ * @desc Imagem de HP para a Hud
+ * @default HP
+ *
+ * @param HP_Image_X
+ * @desc Posição X da Imagem de HP para a Hud
+ * @default 88
+ *
+ * @param HP_Image_Y
+ * @desc Posição Y da Imagem de HP para a Hud
+ * @default 26
+ *
+ * @param MP_Image
+ * @desc Imagem de MP para a Hud
+ * @default MP
+ *
+ * @param MP_Image_X
+ * @desc Posição X da Imagem de MP para a Hud
+ * @default 88
+ *
+ * @param MP_Image_Y
+ * @desc Posição Y da Imagem de MP para a Hud
+ * @default 50
+ *
+ * @param XP_Image
+ * @desc Imagem de XP para a Hud
+ * @default XP
+ *
+ * @param XP_Image_X
+ * @desc Posição X da Imagem de XP para a Hud
+ * @default 88
+ *
+ * @param XP_Image_Y
+ * @desc Posição Y da Imagem de XP para a Hud
+ * @default 74
+
+ * @param ====================
 */
 
 // Cria uma Variavel KR
 var KR = KR || {};
+KR.Hud.version = 1.4
 // Verifica se possui o KR_Plugin
 if (KR["KR_Plugin"] === undefined) {
   alert("Please add KR_Plugin before KR_Hud!");
@@ -25,11 +81,29 @@ if (KR["KR_Plugin"] === undefined) {
   throw new Error("Please add KR_Plugin before KR_Hud!");
 };
 // Verifica a versão do KR_Plugin
-if (KR["version"] < 0.9) {
+if (KR["version"] <= 1.2) {
   alert("Please update KR_Plugin!");
   alert("https://github.com/klebersonromero/KR_MV/tree/master/Plugins");
   throw new Error("Please update KR_Plugin!");
 }
+
+//-------------------------------------------------------------------------------------------------
+//  CONFIG HUD
+//-------------------------------------------------------------------------------------------------
+KR.Hud.parameters         = PluginManager.parameters('KR_Hud');
+KR.Hud.DefaultActor       = Number(KR.Hud.parameters['Default Actor'] || 1);
+KR.Hud.Back_Sprite        = KR.Hud.parameters['BackSprite_Hud'] || "HUD_Background";
+KR.Hud.Back_X             = Number(KR.Hud.parameters['HUD_Back_X'] || 40);
+KR.Hud.Back_Y             = Number(KR.Hud.parameters['HUD_Back_Y'] || 20);
+KR.Hud.HP_Sprite          = KR.Hud.parameters['HP_Image'] || "HP";
+KR.Hud.HP_Image_X         = Number(KR.Hud.parameters['HP_Image_X'] || 88);
+KR.Hud.HP_Image_Y         = Number(KR.Hud.parameters['HP_Image_Y'] || 26);
+KR.Hud.MP_Sprite          = KR.Hud.parameters['MP_Image'] || "MP";
+KR.Hud.MP_Image_X         = Number(KR.Hud.parameters['MP_Image_X'] || 88);
+KR.Hud.MP_Image_Y         = Number(KR.Hud.parameters['MP_Image_Y'] || 50);
+KR.Hud.XP_Sprite          = KR.Hud.parameters['XP_Image'] || "XP";
+KR.Hud.XP_Image_X         = Number(KR.Hud.parameters['XP_Image_X'] || 88);
+KR.Hud.XP_Image_Y         = Number(KR.Hud.parameters['XP_Image_Y'] || 74);
 //-------------------------------------------------------------
 // Alias do Objeto Game_System.initialize
 //-------------------------------------------------------------
@@ -45,9 +119,8 @@ function Sprite_HudBase(){
 	this.initialize.apply(this, arguments);
 };
 //---------------------------------------------------------------------------------------
-// Defique que Sprite_HudBase é filha de Sprite
+// Defique que Sprite_HudBase é filha de Sprite e utiliza o Construtor
 Sprite_HudBase.prototype = Object.create(Sprite.prototype);
-// Constroi essa filhiação
 Sprite_HudBase.prototype.constructor = Sprite_HudBase;
 //---------------------------------------------------------------------------------------
 // Metodo Initialize
@@ -66,7 +139,19 @@ Sprite_HudBase.prototype.update = function () {
   Sprite.prototype.update.apply(this, arguments);
   this.updateBack_Sprite();
   this.updateBar();
-}
+  if(KR.Hud.hide == true){
+    this._back_sprite.opacity = 0;
+    this._hp_sprite.opacity   = 0;
+    this._mp_sprite.opacity   = 0;
+    this._xp_sprite.opacity   = 0;
+  };
+  if(KR.Hud.hide == false){
+    this._back_sprite.opacity = 255;
+    this._hp_sprite.opacity   = 255;
+    this._mp_sprite.opacity   = 255;
+    this._xp_sprite.opacity   = 255;
+  };
+};
 //---------------------------------------------------------------------------------------
 //  Atualização da Sprite_Base da HUD
 //---------------------------------------------------------------------------------------
