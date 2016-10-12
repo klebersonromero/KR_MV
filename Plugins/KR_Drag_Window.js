@@ -5,6 +5,17 @@
  * @version 2.0
  * @help
  * Esse plugin adiciona um metodo de arrasto de janela drag and move.
+ * Log Versão 2.0
+ *
+ * Adicionado função de fechamento de janela.
+ * Adicionado Sons de fechamento ou não da janela.
+ * Corrigido Bug da Area.
+ * Alguns bug's de posicionamento corrigidos.
+ *
+ * Log Versão 1.0
+ *
+ * Criado as funções de arrasto da janela. 
+ *
  */
 
   //=======================================================================//
@@ -20,6 +31,8 @@ Window_Base.prototype.initialize = function(x, y, width, height) {
     this.draggable = true;
     this.closeable = true;
     this.widgets = [];
+    this.max_X = Graphics.width - this.width;
+    this.max_Y = Graphics.height - this.height;
 };
   //=======================================================================//
  //  ** Metodo Alias do Window_Base.update                                //
@@ -65,7 +78,7 @@ Window_Base.prototype.check_dragability = function() {
         }
     } else {
         if(this.in_draging)  
-            this.drag_cancel();         // Cancela o arrasto
+           this.drag_cancel();         // Cancela o arrasto
     }
 };
   //=======================================================================//
@@ -85,13 +98,11 @@ Window_Base.prototype.in_area = function(x,y,width,height) {
     var tx = TouchInput.x;
     var ty = TouchInput.y;   
     if(tx >= this.x+x && tx <= (this.x+this.width) && ty >= this.y+y && ty <= (this.y+height)) {
-      console.log("na area")
-    	return true
+      	return true
     }else{
     	return false
     }
 };
-
   //=======================================================================//
  //  ** Metodo de verificação está arrastando?                            //
 //=======================================================================//
@@ -108,6 +119,7 @@ Window_Base.prototype.drag_cancel = function() {
     this.in_draging = false;
     this.update_pos_grid();
     this.backOpacity = 200;
+    
 };
   //=======================================================================//
  //  ** Metodo de Atualização da posição do arrasto                       //
@@ -122,19 +134,14 @@ Window_Base.prototype.update_in_drag = function() {
  //  ** Metodo de Atualização da posição do arrasto dentro da area do grafico //
 //===========================================================================//
 Window_Base.prototype.update_pos_grid = function() {
-    var size = 12;
-    var maxX = Graphics.width - this.width;
-    var maxY = Graphics.height - this.height;
-    for (var i = 0; i < Graphics.width; i += size) {
-        if ( i > this.x ) {
-            this.x = (i-size).clamp(0,maxX);
-            break;
-        }
+    if (this.x > this.max_X){
+    	return this.x = this.max_X;
+    }else if (this.x < 0) {
+    	return this.x = 0;	
     }
-    for (var i = 0; i < Graphics.height; i += size) {
-        if ( i > this.y ) {
-            this.y = (i-size).clamp(0,maxY);
-            break;
-        }
+    if (this.y > this.max_Y){
+    	return this.y = this.max_Y;
+    }else if (this.y < 0) {
+		return this.y = 0;
     }
 };
