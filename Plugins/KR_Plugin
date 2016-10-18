@@ -2,7 +2,7 @@
  *
  * @plugindesc KR_Plugin
  * @author Kleberson Romero (GS_TEAM)
- * @version 1.4
+ * @version 1.5
  *
  * @param ===================
  * @default  KR_PLUGIN WATHERMARK CONFIG
@@ -28,6 +28,9 @@
  *
  * Esse plugin possui configuração de outros plugins 
  * Atualizações:
+
+ * Versão 1.5
+ * Adicionado Objeto KR.Window necessário para KR_Drag_Window
 
  * Versão 1.4
  * Devolução da automomia de configuração da HUD para o KR_HUD Plugin;
@@ -74,9 +77,10 @@ var KR = KR || {};
 KR.KR_Plugin = {};
 KR.Hud       = {};
 KR.Title     = {};
+KR.Window    = {};
 //-------------------------------------------------------------------------------------------------
 //  Versão do Plugin
-KR.version = 1.4
+KR.version = 1.5
 //-------------------------------------------------------------------------------------------------
 //  CONFIG WatherMark
 //-------------------------------------------------------------------------------------------------
