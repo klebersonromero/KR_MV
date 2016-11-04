@@ -2,7 +2,7 @@
 *
  * @plugindesc KR_Drag_Window
  * @author Kleberson Romero (GS_TEAM)
- * @version 2.2
+ * @version 2.3
  *
  * @param Dragable
  * @desc true/false para Ativar ou Desativar o arrasto da Janela
@@ -14,6 +14,28 @@
  *
  * @help
  * Esse plugin adiciona várias funções na Window_Base padrão do RMMV.
+ *
+ * Como Arrasto de Janela, Fechamento por Click em área, área de uma Janela.
+ *
+ * Adicionar botão a uma Janela, para add chame os codigo abaixo no Initilize da janela;
+ * this.createButton(x,y,altura,'grafico na pasta System',"Texto");
+ * Para add um comando no Botão adicione esse codigo abaixo do this.createButton
+ * this.winbuttons[0].setClickHandler(this.metodo.bind(this));
+ *
+ * Exemplo:
+ * Window_TitleCommand.prototype.initialize = function() {
+ *   Window_Command.prototype.initialize.call(this, 0, 0);
+ *   this.updatePlacement();
+ *   this.openness = 0;
+ *   this.createButton(20,0,24,'Button48',"Registrar");
+ *   this.winbuttons[0].setClickHandler(this.processOk.bind(this));
+ *   this.selectLast();
+ * };
+ *
+ * Log Versão 2.3
+ *
+ * Bug de janela ativa mesmo depois de fechada resolvido.
+ * adicionado função de botões.
  *
  * Log Versão 2.2
  *
@@ -71,7 +93,51 @@ Window_Base.prototype.initialize = function(x, y, width, height) {
     this.closeable = KR.Window.Closeable;
     this.max_X = Graphics.width - this.width;
     this.max_Y = Graphics.height - this.height;
+    this.buttoncreate = null;
+    //this.createButton(50,0,24,'Button48',"Registrar");
     $window = this;
+};
+
+  //=======================================================================//
+ //  ** Metodo Alias do Window_Base.createButton                         //
+//=======================================================================//
+Window_Base.prototype.createButton = function(x,y,height,graph,text) {
+    this.buttoncreate = true;
+    //-----------------------------//
+    var bitmap = ImageManager.loadSystem(graph);
+    var buttonWidth =  text.length * 7.5//width;
+    var buttonHeight = height;
+    //-----------------------------//
+    this.buttonX = x;
+    this.buttonY = y;
+    this.text = text;
+    this.winbuttons = []
+    //-----------------------------//
+    for (var i = 0; i < 5; i++) {
+      //-----------------------------//
+      var winbutton = new Sprite_Button();
+      var x = buttonWidth * i;
+      var w = buttonWidth// * (i === 4 ? 2 : 1);
+      //-----------------------------//
+      winbutton.bitmap = bitmap;
+      winbutton.bitmap.clear;
+      winbutton.setColdFrame(x, 0, w, buttonHeight);
+      winbutton.visible = false;
+      //-----------------------------//
+      this.winbuttons.push(winbutton);
+      this.addChild(winbutton);
+    }
+    // Essa forma é usada quando chama funções que serão criadas como a onButtonDown2
+    this.winbuttons[0].setClickHandler();//(this.on_close.bind(this));
+};
+  //=======================================================================//
+ //  ** Metodo executado ao Clicar no ButtonX                             //
+//=======================================================================//
+Window_Base.prototype.clickButtonX = function(){
+  SoundManager.playOk();
+  this.deactivate();
+  this.hide();
+  this.close(); 
 };
   //=======================================================================//
  //  ** Metodo Alias do Window_Base.update                                //
@@ -80,16 +146,43 @@ var alias_Window_Base_update_drag = Window_Base.prototype.update;
 Window_Base.prototype.update = function() {
     alias_Window_Base_update_drag.call(this,arguments);
     this.update_drag_move();
-    this.on_close();
+    if (TouchInput.isTriggered() && (this.in_area(this.width-16,0,16,16)) && (this.closeable)){
+    this.on_close();  
+    }else if (TouchInput.isTriggered() && (this.in_area(this.width-16,0,16,16)) && (!this.closeable)){ SoundManager.playBuzzer() }  
+    this.updateVisibilityButton();
+    this.positionButtons();
+};
+  //=======================================================================//
+ //  ** Metodo Atualiza a posição dos Botões                              //
+//=======================================================================//
+Window_Base.prototype.positionButtons = function() {
+    if(this.buttoncreate){
+    this.winbuttons[0].x = this.buttonX;
+    this.winbuttons[0].y = this.buttonY;
+    this.winbuttons[0].bitmap._drawTextOutline(this.text,this.winbuttons[0].width/6,14,this.width); // Escreve a sobra do texto
+    this.winbuttons[0].bitmap._drawTextBody(this.text,this.winbuttons[0].width/6,14,this.width);   //  Escrebe o texto 
+    }
+};
+  //=======================================================================//
+ //  ** Metodo que Atualiza a Visibilidade do Button                      //
+//=======================================================================//
+Window_Base.prototype.updateVisibilityButton = function(){
+  if(this.buttoncreate){
+  if(!this.closeable){
+    this.winbuttons[0].visible = false;
+  }else if(this.closeable){
+    this.winbuttons[0].visible = true;
+  }
+  }
 };
   //=======================================================================//
  //  ** Metodo Alias do Window_Base.on_close                              //
 //=======================================================================//
 Window_Base.prototype.on_close = function(){
-if (TouchInput.isTriggered() && (this.in_area(this.width-16,0,16,16)) && (this.closeable)){
   SoundManager.playOk();
+  this.deactivate();
   this.hide();
-}else if (TouchInput.isTriggered() && (this.in_area(this.width-16,0,16,16)) && (!this.closeable)){ SoundManager.playBuzzer() }
+  this.close();
 };
   //=======================================================================//
  //  ** Metodo de atualização drag_move Window_Base                       //
